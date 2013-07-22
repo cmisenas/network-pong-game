@@ -115,7 +115,6 @@ Game.prototype = {
 	  var playerIndex = findIndexById(playerId);
 	  this.players[playerIndex].x = data.x;
 	  client.broadcast.emit('player moved', {x: data.x});
-    console.log(client.manager.sockets)
   },
 
   removePlayer: function(client) {
