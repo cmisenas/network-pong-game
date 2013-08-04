@@ -2,10 +2,9 @@
 
 	var canvas = document.getElementById('canvas');
 	var ctx = canvas.getContext('2d');
-	canvas.width = 330;
-	canvas.height = 500;
-	canvas.style.display = 'block';
-	canvas.style.margin = 'auto';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
 	var player, otherPlayer, ball, game;
 	var time, pressedKey = [];
 
@@ -138,7 +137,7 @@
 
 	//Rendering functions
 	function drawCanvas(){
-		ctx.fillStyle = '#333';
+		ctx.fillStyle = '#000';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 	}
 
