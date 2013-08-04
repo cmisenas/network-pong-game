@@ -1,4 +1,4 @@
-function Ball(w, h){
+function Ball(w, h) {
 	var CANVAS_WIDTH = w;
 	var CANVAS_HEIGHT = h;
 

@@ -1,4 +1,4 @@
-function Player(x, n){
+function Player(x, n) {
 	this.x = x;
 	this.y = null;
   this.num = n;
