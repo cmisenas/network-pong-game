@@ -33,8 +33,8 @@ Game.prototype.addPlayer = function(client, data) {
     this.players.push({id: playerId});
 
     var playerIndex = findIndexById(playerId);
-    this.players[playerIndex].x = data.x;
-    this.players[playerIndex].y = (this.players.length === 1? data.canvasHeight - data.height - 5: 5);
+    this.players[playerIndex].y = data.y;
+    this.players[playerIndex].x = this.players.length === 1? data.canvasWidth - data.width - 10 : 10;
     this.players[playerIndex].width = data.width;
     this.players[playerIndex].height = data.height;
     this.players[playerIndex].score = 0;
@@ -44,14 +44,16 @@ Game.prototype.addPlayer = function(client, data) {
 
     //broadcast to other players about new player
     if(this.players.length > 1){
-      client.broadcast.emit('new player', {id: playerIndex, id2: playerId, x: data.x});
+      client.broadcast.emit('new player', {id: playerIndex, id2: playerId, y: this.players[playerIndex].y, x: this.players[playerIndex].x, nth: 2});
     }
 
     //send new player data about existing players
     for(var i = 0; i < this.players.length; i++){
-      if(this.players[i].id !== playerId)
-        client.emit('new player', {id: i, id2: this.players[i].id, x: this.players[i].x, nth: 1});
+      if(this.players[i].id !== playerId) {
+        client.emit('new player', {id: i, id2: this.players[i].id, y: this.players[i].y, x: this.players[i].x, nth: 1});
+      }
     }
+
 
     client.emit('assign player', {nth: nth});
     client.emit('create ball', {x: this.ball.x, y: this.ball.y});
@@ -70,21 +72,21 @@ Game.prototype.start = function() {
 
     for(var i = 0, maxPlayers = self.players.length; i < maxPlayers; i++){
       var nth = parseInt(self.players[i].nth);
-      var playerYToCompare = nth === 1 ?
-        self.players[i].y :
-        self.players[i].y + self.players[i].height;
+      var playerXToCompare = nth === 1 ?
+        self.players[i].x :
+        self.players[i].x + self.players[i].width;
 
       if(nth === 1){
-        var yCompared = self.ball.y + self.ball.r >= playerYToCompare;
+        var xCompared = self.ball.x + self.ball.r >= playerXToCompare;
       }else{
-        var yCompared = self.ball.y - self.ball.r <= playerYToCompare;
+        var xCompared = self.ball.x - self.ball.r <= playerXToCompare;
       }
 
-      if ((self.ball.x + self.ball.r >= self.players[i].x &&
-           self.ball.x - self.ball.r <= self.players[i].x + self.players[i].width) &&
-          yCompared) {
+      if ((self.ball.y + self.ball.r >= self.players[i].y &&
+           self.ball.y - self.ball.r <= self.players[i].y + self.players[i].height) &&
+          xCompared) {
         self.players[i].score++;
-        self.ball.directionY *= -1;
+        self.ball.directionX *= -1;
         socket.sockets.emit('update score', {nth: nth, score: self.players[i].score});
       }
     }
@@ -104,8 +106,8 @@ Game.prototype.start = function() {
 Game.prototype.movePlayer = function(client, data) {
   var playerId = client.id;
   var playerIndex = findIndexById(playerId);
-  this.players[playerIndex].x = data.x;
-  client.broadcast.emit('player moved', {x: data.x});
+  this.players[playerIndex].y = data.y;
+  client.broadcast.emit('player moved', {y: data.y});
 }
 
 Game.prototype.removePlayer = function(client) {

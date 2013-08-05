@@ -7,19 +7,19 @@ var player, otherPlayer, ball, game;
 var time, pressedKey = [];
 
 function Paddle(){
-  this.w = 50;
-  this.h = 5;
-  this.x = 0;
-  this.y;
-  this.vx = 200;
+  this.w = 10;
+  this.h = 70;
+  this.x;
+  this.y = 5;
+  this.vy = 200;
   this.color = '#fff';
   this.score = 0;
 
   this.move = function(mod){
-    if(pressedKey[37] && this.x > 0){
-      this.x -= this.vx * mod;
-    }else if(pressedKey[39] && this.x + this.w < canvas.width){
-      this.x += this.vx * mod;
+    if(pressedKey[38] && this.y > 0){
+      this.y -= this.vy * mod;
+    }else if(pressedKey[40] && this.y + this.h < canvas.height){
+      this.y += this.vy * mod;
     }
   }
 
@@ -42,7 +42,7 @@ function Ball(x, y){
   }
 
   this.draw = function(){
-    ctx.fillStyle = '#f99';
+    ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
     ctx.fill();
@@ -56,9 +56,10 @@ function init(){
 
   //instantiate player
   player = new Paddle();
+  console.log('local', player);
 
   //emit player has joined
-  socket.emit('new player', {x: player.x, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.w, height: player.h});
+  socket.emit('new player', {y: player.y, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.w, height: player.h});
 
   setEventHandlers();
 
@@ -80,15 +81,16 @@ function onNewPlayer(data){
   otherPlayer = new Paddle();
   otherPlayer.id = data.id;
   otherPlayer.x = data.x;
-  otherPlayer.y = data.nth === 1? canvas.height - otherPlayer.h - 5: 5;
+  otherPlayer.y = data.y;
 
   otherPlayer.nth = data.nth;
   otherPlayer.id2 = data.id2;
+  console.log(otherPlayer, data.x);
 }
 
 function onPlayerAssign(data){
   player.nth = data.nth;
-  player.y = (data.nth === 1)? canvas.height - player.h - 5: 5;
+  player.x = (data.nth === 1)? canvas.width - player.w - 10: 10;
 }
 
 function onCreateBall(data){
@@ -105,7 +107,7 @@ function onDisconnected(data){
 }
 
 function onPlayerMoved(data){
-  otherPlayer.x = data.x;
+  otherPlayer.y = data.y;
 }
 
 function onGameOver(data){
@@ -126,7 +128,7 @@ function onUpdateScore(data){
 
 window.addEventListener('keydown', function(e){
   pressedKey[e.keyCode] = true;
-  socket.emit('player moved', {x: player.x});
+  socket.emit('player moved', {y: player.y});
 });
 
 window.addEventListener('keyup', function(e){

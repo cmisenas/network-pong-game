@@ -9,4 +9,3 @@ function Player(n, w, h) {
 }
 
 module.exports = Player;
-this.Player = Player;
