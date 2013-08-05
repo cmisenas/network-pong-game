@@ -13,7 +13,7 @@ var Player = require('./Players'),
     Game = require('./Game');
 
 Game.prototype.addPlayer = function(client, data) {
-  if(this.players.length <= 2) {
+  if(this.players.length < 2) {
     //only set the canvasWidth and canvasHeight with the first player
     if(this.players.length === 0){
       this.setPlayAreaDimensions(data.canvasWidth, data.canvasHeight);
@@ -22,7 +22,7 @@ Game.prototype.addPlayer = function(client, data) {
 
     var playerId = client.id;
     var playerX = this.players.length + 1 === 1? data.canvasWidth - data.width - 10 : 10;
-    var nth = (this.players.length + 1 > 1? 2: 1);
+    var nth = this.players.length + 1 === 1? 1: 2;
 
     var player = new Player(playerId, playerX, data.y, data.width, data.height, nth);
     
@@ -41,7 +41,6 @@ Game.prototype.addPlayer = function(client, data) {
       }
     }
 
-
     client.emit('assign player', {nth: nth});
     client.emit('create ball', {x: this.ball.x, y: this.ball.y});
 
@@ -57,6 +56,7 @@ Game.prototype.start = function() {
   var loop = setInterval(function() {
     self.ball.update((Date.now() - time)/1000);
 
+    //do collision detection on the game objects--player 1, 2 and ball
     for(var i = 0, maxPlayers = self.players.length; i < maxPlayers; i++){
       var nth = parseInt(self.players[i].nth);
       var playerXToCompare = nth === 1 ?
@@ -133,10 +133,6 @@ var startServer = function() {
   console.log("Server started on port", PORT);
   return app;
 };
-
-/*
-	players = [{id:client.id, x:.., y:..}, ...];
-*/
 
 function initSocketIO(app){
 	var socket = io.listen(app);
