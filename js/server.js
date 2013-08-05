@@ -20,22 +20,14 @@ Game.prototype.addPlayer = function(client, data) {
       this.ball = new Ball(this.width, this.height);
     }
 
-    // this could be cleaned up
-    // just make a player obj, assign to player, push onto this.players,
-    // then setting x, y, width etc can be done on player
-
     var playerId = client.id;
-    this.players.push({id: playerId});
+    var playerX = this.players.length + 1 === 1? data.canvasWidth - data.width - 10 : 10;
+    var nth = (this.players.length + 1 > 1? 2: 1);
 
+    var player = new Player(playerId, playerX, data.y, data.width, data.height, nth);
+    
+    this.players.push(player);
     var playerIndex = findIndexById(playerId);
-    this.players[playerIndex].y = data.y;
-    this.players[playerIndex].x = this.players.length === 1? data.canvasWidth - data.width - 10 : 10;
-    this.players[playerIndex].width = data.width;
-    this.players[playerIndex].height = data.height;
-    this.players[playerIndex].score = 0;
-
-    var nth = (this.players.length > 1? 2: 1);
-    this.players[playerIndex].nth = nth;
 
     //broadcast to other players about new player
     if(this.players.length > 1){
