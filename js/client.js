@@ -102,8 +102,8 @@ function onMoveBall(data){
 function onDisconnected(data){
   delete otherPlayer.x;
   delete otherPlayer.y;
-  delete otherPlayer.nth;
-  delete otherPlayer.id;
+  clearTimeout(game);
+  drawGameOver('Player ' + otherPlayer.nth + ' Disconnected');
 }
 
 function onPlayerMoved(data){
@@ -141,7 +141,7 @@ function drawCanvas(){
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawGameOver(){
+function drawGameOver(msg){
   var player1 = parseInt(player.nth) === 1? player: otherPlayer;
   var player2 = parseInt(player.nth) === 2? player: otherPlayer;
   var totalScore = player1.score + player2.score;
@@ -153,9 +153,11 @@ function drawGameOver(){
   ctx.font = '30px Verdana';
   ctx.fillText('Game Over', (canvas.width - 100)/2, canvas.height/2, 100);
   ctx.font = '20px Verdana';
-  ctx.fillText('Player ' + winner + ' Won!', (canvas.width - 60)/2, (canvas.height + 50)/2, 60);
-  /*ctx.fillText('Player 1: ' + player1.score + ' Pts.', (W - 60)/2, (H + 50)/2, 60);
-    ctx.fillText('Player 2: ' + player2.score + ' Pts.', (W - 60)/2, (H + 100)/2, 60);*/
+  if (msg !== undefined) {
+    ctx.fillText(msg, (canvas.width - 100)/2, (canvas.height + 50)/2, 100);
+  } else {
+    ctx.fillText('Player ' + winner + ' Won!', (canvas.width - 60)/2, (canvas.height + 50)/2, 60);
+  }
 }
 
 function drawAll(){
