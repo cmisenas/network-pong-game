@@ -24,11 +24,6 @@ Game.prototype.addPlayer = function(client, data) {
     // just make a player obj, assign to player, push onto this.players,
     // then setting x, y, width etc can be done on player
 
-    // id2 seems redundant.  I think it can be deleted.
-
-    // why do you broadcast/emit player ids that are their array indices,
-    // rather than just using their client.id?
-
     var playerId = client.id;
     this.players.push({id: playerId});
 
@@ -44,13 +39,13 @@ Game.prototype.addPlayer = function(client, data) {
 
     //broadcast to other players about new player
     if(this.players.length > 1){
-      client.broadcast.emit('new player', {id: playerIndex, id2: playerId, y: this.players[playerIndex].y, x: this.players[playerIndex].x, nth: 2});
+      client.broadcast.emit('new player', {id: playerId, y: this.players[playerIndex].y, x: this.players[playerIndex].x, nth: 2});
     }
 
     //send new player data about existing players
     for(var i = 0; i < this.players.length; i++){
       if(this.players[i].id !== playerId) {
-        client.emit('new player', {id: i, id2: this.players[i].id, y: this.players[i].y, x: this.players[i].x, nth: 1});
+        client.emit('new player', {id: this.players[i].id, y: this.players[i].y, x: this.players[i].x, nth: 1});
       }
     }
 
@@ -115,7 +110,7 @@ Game.prototype.removePlayer = function(client) {
   var playerId = client.id;
   this.players.splice(findIndexById(playerId), 1);
   //broadcast to other players that client disconnected
-  if(this.players.length > 1) {
+  if(this.players.length > 0) {
     client.broadcast.emit('player disconnected', {id: playerId});
   }
 }

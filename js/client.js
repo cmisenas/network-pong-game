@@ -56,7 +56,6 @@ function init(){
 
   //instantiate player
   player = new Paddle();
-  console.log('local', player);
 
   //emit player has joined
   socket.emit('new player', {y: player.y, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.w, height: player.h});
@@ -79,13 +78,11 @@ function setEventHandlers(){
 
 function onNewPlayer(data){
   otherPlayer = new Paddle();
-  otherPlayer.id = data.id;
   otherPlayer.x = data.x;
   otherPlayer.y = data.y;
 
   otherPlayer.nth = data.nth;
-  otherPlayer.id2 = data.id2;
-  console.log(otherPlayer, data.x);
+  otherPlayer.id = data.id;
 }
 
 function onPlayerAssign(data){
@@ -103,7 +100,10 @@ function onMoveBall(data){
 }
 
 function onDisconnected(data){
-  delete otherPlayer;
+  delete otherPlayer.x;
+  delete otherPlayer.y;
+  delete otherPlayer.nth;
+  delete otherPlayer.id;
 }
 
 function onPlayerMoved(data){
