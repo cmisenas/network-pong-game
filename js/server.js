@@ -8,11 +8,12 @@ var http = require('http'),
     io = require('socket.io'),
     url = require('url');
 
-var Player = require('./Players'),
-    Ball = require('./Ball');
-    Game = require('./Game');
+var Player = require('./Players').Player,
+    Ball = require('./Ball').Ball;
+    Game = require('./Game').Game;
 
 Game.prototype.addPlayer = function(client, data) {
+  //only accept up to 2 players
   if(this.players.length < 2) {
     //only set the canvasWidth and canvasHeight with the first player
     if(this.players.length === 0){
@@ -23,7 +24,6 @@ Game.prototype.addPlayer = function(client, data) {
     var playerId = client.id;
     var playerX = this.players.length + 1 === 1? data.canvasWidth - data.width - 10 : 10;
     var nth = this.players.length + 1 === 1? 1: 2;
-
     var player = new Player(playerId, playerX, data.y, data.width, data.height, nth);
     
     this.players.push(player);
@@ -44,7 +44,7 @@ Game.prototype.addPlayer = function(client, data) {
     client.emit('assign player', {nth: nth});
     client.emit('create ball', {x: this.ball.x, y: this.ball.y});
 
-    if(this.players.length > 1){
+    if(this.players.length === 2){
       this.start();
     }
   }
