@@ -41,7 +41,7 @@ Game.prototype.addPlayer = function(client, data) {
       }
     }
 
-    client.emit('assign player', {nth: nth});
+    client.emit('assign player', {nth: nth, x: playerX});
     client.emit('create ball', {x: this.ball.x, y: this.ball.y});
 
     if(this.players.length === 2){
