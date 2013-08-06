@@ -1,5 +1,4 @@
 // ideas for improvement:
-// - instead of setting up game on client connection, create game, ball, play area size immediately on server.  Makes code easier.
 // - instead of sending individual updates about game state changes (ball, score etc), send periodic updates of whole game state from server to client.  Then make clients just run through that state and set client state to the same.  Also makes code way easier.
 
 var http = require('http'),
@@ -11,14 +10,14 @@ var Player = require('./Players').Player,
     Ball = require('./Ball').Ball;
     Game = require('./Game').Game;
 
+Game.prototype.init = function() {
+    this.ball = new Ball(this.width, this.height);
+}
+
 Game.prototype.addPlayer = function(client, data) {
   //only accept up to 2 players
   if(this.players.length < 2) {
     //only set the canvasWidth and canvasHeight with the first player
-    if(this.players.length === 0){
-      this.setPlayAreaDimensions(data.canvasWidth, data.canvasHeight);
-      this.ball = new Ball(this.width, this.height);
-    }
 
     var playerId = client.id;
     var playerX = this.players.length + 1 === 1? data.canvasWidth - data.width - 10 : 10;
@@ -177,4 +176,5 @@ function findIndexById(playerId){
 
 var socket = initSocketIO(startServer());
 var game = new Game();
+game.init();
 setEventHandlers(socket);

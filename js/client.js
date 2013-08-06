@@ -1,8 +1,3 @@
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
 var player, otherPlayer, ball, game;
 var time, pressedKey = [];
 
@@ -36,22 +31,17 @@ Ball.prototype.draw = function(){
   ctx.closePath();
 }
 
-function init(){
-
+Game.prototype.init = function() {
   socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
-
   //instantiate player
   player = new Player(null, null, 5, 10, 70, null);
-
   //emit player has joined
   socket.emit('new player', {y: player.y, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.width, height: player.height});
-
-  setEventHandlers();
-
+  this.setEventHandlers();
   time = Date.now();
 }
 
-function setEventHandlers(){
+Game.prototype.setEventHandlers = function(){
   socket.on('new player', onNewPlayer);
   socket.on('assign player', onPlayerAssign);
   socket.on('create ball', onCreateBall);
@@ -61,6 +51,29 @@ function setEventHandlers(){
   socket.on('game over', onGameOver);
   socket.on('update score', onUpdateScore);
 }
+
+Game.prototype.drawAll = function(){
+  drawCanvas();
+  player.draw();
+  if(otherPlayer)
+    otherPlayer.draw();
+  if(ball)
+    ball.draw();
+}
+
+Game.prototype.updateAll = function(mod){
+  player.move(mod);
+}
+
+Game.prototype.loop = function(){
+  var self = this;
+  game = setInterval(function() {
+    self.updateAll((Date.now() - time)/1000);
+    self.drawAll();
+    time = Date.now();
+  }, 50);
+}
+
 
 function onNewPlayer(data){
   otherPlayer = new Player(data.id, data.x, data.y, 10, 70, data.nth);
@@ -140,26 +153,11 @@ function drawGameOver(msg){
   }
 }
 
-function drawAll(){
-  drawCanvas();
-  player.draw();
-  if(otherPlayer)
-    otherPlayer.draw();
-  if(ball)
-    ball.draw();
-}
+var main = new Game();
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+canvas.width = main.width;
+canvas.height = main.height;
 
-function updateAll(mod){
-  player.move(mod);
-}
-
-function gameLoop(){
-  updateAll((Date.now() - time)/1000);
-  drawAll();
-
-  time = Date.now();
-  game = setTimeout(gameLoop, 50);
-}
-
-init();
-gameLoop();
+main.init();
+main.loop();

@@ -1,11 +1,8 @@
 ;(function(exports) {
   function Game() {
     this.players = [];
-  }
-
-  Game.prototype.setPlayAreaDimensions = function(width, height) {
-    this.width = width;
-    this.height = height;
+    this.width = 750;
+    this.height = 500;
   }
 
   exports.Game = Game;
