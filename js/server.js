@@ -109,8 +109,13 @@ Game.prototype.removePlayer = function(client) {
 
 var serveStaticFile = function(filename, type, res) {
   fs.readFile(filename, 'utf8', function (err, data) {
-    res.writeHead(200, { 'Content-Type': type });
-    res.end(data);
+    if (data) {
+      res.writeHead(200, { 'Content-Type': type });
+      res.end(data);
+    } else {
+		  res.writeHead(400);
+		  res.end('404 Not Found');
+    }
   });
 };
 
@@ -120,13 +125,9 @@ var startServer = function() {
 	  var pathname = url.parse(req.url).pathname;
 	  if (pathname == '/') {
       serveStaticFile('index.html', 'text/html', res);
-	  } else if (pathname == '/js/client.js') {
-      serveStaticFile('js/client.js', 'text/javascript', res);
-	  } else if (pathname == '/style/main.css') {
-      serveStaticFile('style/main.css', 'text/css', res);
     } else {
-		  res.writeHead(400);
-		  res.end('404 Not Found');
+      var type = pathname.indexOf('.js') > -1 ? 'text/javascript' : 'text/css' ;
+      serveStaticFile(pathname.substring(1), type, res);
 	  }
   }).listen(PORT);
 
