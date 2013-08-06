@@ -128,10 +128,7 @@ function drawCanvas(){
 }
 
 function drawGameOver(msg){
-  var player1 = parseInt(player.nth) === 1? player: otherPlayer;
-  var player2 = parseInt(player.nth) === 2? player: otherPlayer;
-  var totalScore = player1.score + player2.score;
-  var winner = ((totalScore % 2) === 0)?2:1;
+  var winner = (player.score + otherPlayer.score) % 2 === 0 ? 2 : 1;
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
