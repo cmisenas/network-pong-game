@@ -6,29 +6,20 @@ canvas.height = window.innerHeight;
 var player, otherPlayer, ball, game;
 var time, pressedKey = [];
 
-function Paddle(){
-  this.w = 10;
-  this.h = 70;
-  this.x;
-  this.y = 5;
-  this.vy = 200;
-  this.color = '#fff';
-  this.score = 0;
 
-  this.move = function(mod){
-    if(pressedKey[38] && this.y > 0){
-      this.y -= this.vy * mod;
-    }else if(pressedKey[40] && this.y + this.h < canvas.height){
-      this.y += this.vy * mod;
-    }
+Player.prototype.move = function(mod) {
+  if(pressedKey[38] && this.y > 0){
+    this.y -= this.vy * mod;
+  }else if(pressedKey[40] && this.y + this.height < canvas.height){
+    this.y += this.vy * mod;
   }
+}
 
-  this.draw = function(){
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.fillRect(this.x, this.y, this.w, this.h);
-    ctx.closePath();
-  }
+Player.prototype.draw = function() {
+  ctx.fillStyle = this.color;
+  ctx.beginPath();
+  ctx.fillRect(this.x, this.y, this.width, this.height);
+  ctx.closePath();
 }
 
 function Ball(x, y){
@@ -55,10 +46,10 @@ function init(){
   socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
 
   //instantiate player
-  player = new Paddle();
+  player = new Player(null, null, 5, 10, 70, null);
 
   //emit player has joined
-  socket.emit('new player', {y: player.y, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.w, height: player.h});
+  socket.emit('new player', {y: player.y, canvasWidth: canvas.width, canvasHeight: canvas.height, width: player.width, height: player.height});
 
   setEventHandlers();
 
@@ -77,17 +68,12 @@ function setEventHandlers(){
 }
 
 function onNewPlayer(data){
-  otherPlayer = new Paddle();
-  otherPlayer.x = data.x;
-  otherPlayer.y = data.y;
-
-  otherPlayer.nth = data.nth;
-  otherPlayer.id = data.id;
+  otherPlayer = new Player(data.id, data.x, data.y, 10, 70, data.nth);
 }
 
 function onPlayerAssign(data){
   player.nth = data.nth;
-  player.x = (data.nth === 1)? canvas.width - player.w - 10: 10;
+  player.x = data.x;
 }
 
 function onCreateBall(data){
