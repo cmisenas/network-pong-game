@@ -22,23 +22,18 @@ Player.prototype.draw = function() {
   ctx.closePath();
 }
 
-function Ball(x, y){
-  this.r = 7;
-  this.x = x;
-  this.y = y;
+Ball.prototype.update = function(newX, newY){
+  this.x = newX;
+  this.y = newY;
+}
 
-  this.update = function(newX, newY){
-    this.x = newX;
-    this.y = newY;
-  }
 
-  this.draw = function(){
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
-    ctx.fill();
-    ctx.closePath();
-  }
+Ball.prototype.draw = function(){
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+  ctx.fill();
+  ctx.closePath();
 }
 
 function init(){
@@ -78,7 +73,9 @@ function onPlayerAssign(data){
 
 function onCreateBall(data){
   //instantiate the ball
-  ball = new Ball(data.x, data.y);
+  ball = new Ball(canvas.width, canvas.height);
+  ball.x = data.x;
+  ball.y = data.y;
 }
 
 function onMoveBall(data){
@@ -161,7 +158,6 @@ function gameLoop(){
   drawAll();
 
   time = Date.now();
-
   game = setTimeout(gameLoop, 50);
 }
 
