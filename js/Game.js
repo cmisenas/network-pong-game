@@ -9,4 +9,4 @@
   }
 
   exports.Game = Game;
-}(typeof exports === undefined ? this : module.exports));
+}(typeof exports === 'undefined' ? this : module.exports));

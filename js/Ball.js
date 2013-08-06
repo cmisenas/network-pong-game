@@ -26,4 +26,4 @@
   }
 
   exports.Ball = Ball;
-}(typeof exports === undefined ? this : module.exports));
+}(typeof exports === 'undefined' ? this : module.exports));
