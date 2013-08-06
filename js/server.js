@@ -1,7 +1,6 @@
 // ideas for improvement:
 // - instead of setting up game on client connection, create game, ball, play area size immediately on server.  Makes code easier.
 // - instead of sending individual updates about game state changes (ball, score etc), send periodic updates of whole game state from server to client.  Then make clients just run through that state and set client state to the same.  Also makes code way easier.
-// - bonus points: have Game, Player, Ball objects that are shared between client and server.  Then client can just mirror server state when it gets update.  Have client draw functions live on top of shared Player, Ball objs
 
 var http = require('http'),
     fs = require('fs'),
@@ -105,6 +104,14 @@ Game.prototype.removePlayer = function(client) {
   if(this.players.length > 0) {
     client.broadcast.emit('player disconnected', {id: playerId});
   }
+}
+
+Ball.prototype.update = function(mod){
+  if(this.y - this.r <= 0 || this.y + this.r >= this.CANVAS_HEIGHT)
+    this.directionY *= -1;
+
+  this.x += (this.vx * this.directionX) * mod;
+  this.y += (this.vy * this.directionY) * mod;
 }
 
 var serveStaticFile = function(filename, type, res) {
