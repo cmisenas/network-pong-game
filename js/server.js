@@ -77,7 +77,7 @@ Game.prototype.collisionDetect = function() {
       this.players[i].x + this.players[i].width:
       this.players[i].x ;
 
-
+    //bounce ball if its x is equal to or past the start x of the paddle but not past the end x of the paddle
     if(nth === 1){
       var xCompared = this.ball.x + this.ball.r >= playerXStartToCompare && this.ball.x + this.ball.r < playerXEndToCompare;
     }else{
@@ -95,8 +95,7 @@ Game.prototype.collisionDetect = function() {
 }
 
 Game.prototype.movePlayer = function(client, data) {
-  var playerId = client.id;
-  var playerIndex = findIndexById(playerId);
+  var playerIndex = findIndexById(client.id);
   this.players[playerIndex].y = data.y;
   client.broadcast.emit('player moved', {y: data.y});
 }
