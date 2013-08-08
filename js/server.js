@@ -1,6 +1,3 @@
-// ideas for improvement:
-// - instead of sending individual updates about game state changes (ball, score etc), send periodic updates of whole game state from server to client.  Then make clients just run through that state and set client state to the same.  Also makes code way easier.
-
 var http = require('http'),
     fs = require('fs'),
     io = require('socket.io'),
@@ -17,8 +14,8 @@ Game.prototype.init = function() {
 Game.prototype.addPlayer = function(client, data) {
   //only accept up to 2 players
   if(this.players.length < 2) {
-    //only set the canvasWidth and canvasHeight with the first player
-
+    
+    //figure out the necessary player variables
     var playerId = client.id;
     var playerX = this.players.length + 1 === 1? data.canvasWidth - data.width - 10 : 10;
     var nth = this.players.length + 1 === 1? 1: 2;
@@ -38,10 +35,12 @@ Game.prototype.addPlayer = function(client, data) {
         client.emit('new player', {id: this.players[i].id, y: this.players[i].y, x: this.players[i].x, nth: 1});
       }
     }
-
+    
+    //send player data about itself (which player it is) and the ball
     client.emit('assign player', {nth: nth, x: playerX});
     client.emit('create ball', {x: this.ball.x, y: this.ball.y});
 
+    //start the game once there are 2 players already
     if(this.players.length === 2){
       this.start();
     }
