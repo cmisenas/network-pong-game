@@ -53,29 +53,8 @@ Game.prototype.start = function() {
   var loop = setInterval(function() {
     self.ball.update((Date.now() - time)/1000);
 
-    //do collision detection on the game objects--player 1, 2 and ball
-    for(var i = 0, maxPlayers = self.players.length; i < maxPlayers; i++){
-      var nth = parseInt(self.players[i].nth);
-      var playerXToCompare = nth === 1 ?
-        self.players[i].x :
-        self.players[i].x + self.players[i].width;
-
-      if(nth === 1){
-        var xCompared = self.ball.x + self.ball.r >= playerXToCompare;
-      }else{
-        var xCompared = self.ball.x - self.ball.r <= playerXToCompare;
-      }
-
-      if ((self.ball.y + self.ball.r >= self.players[i].y &&
-           self.ball.y - self.ball.r <= self.players[i].y + self.players[i].height) &&
-          xCompared) {
-        self.players[i].score++;
-        self.ball.directionX *= -1;
-        socket.sockets.emit('update score', {nth: nth, score: self.players[i].score});
-      }
-    }
-
     socket.sockets.emit('move ball', {x: self.ball.x, y: self.ball.y});
+    self.collisionDetect();
 
     if(!self.ball.isInPlayArea()){
       console.log('Game Over');
@@ -85,6 +64,34 @@ Game.prototype.start = function() {
 
     time = Date.now();
   }, 50);
+}
+
+Game.prototype.collisionDetect = function() {
+  //do collision detection on the game objects--player 1, 2 and ball
+  for(var i = 0, maxPlayers = this.players.length; i < maxPlayers; i++){
+    var nth = parseInt(this.players[i].nth);
+    var playerXStartToCompare = nth === 1 ?
+      this.players[i].x :
+      this.players[i].x + this.players[i].width;
+    var playerXEndToCompare = nth === 1 ?
+      this.players[i].x + this.players[i].width:
+      this.players[i].x ;
+
+
+    if(nth === 1){
+      var xCompared = this.ball.x + this.ball.r >= playerXStartToCompare && this.ball.x + this.ball.r < playerXEndToCompare;
+    }else{
+      var xCompared = this.ball.x - this.ball.r <= playerXStartToCompare && this.ball.x + this.ball.r > playerXEndToCompare;
+    }
+
+    if ((this.ball.y + this.ball.r >= this.players[i].y &&
+         this.ball.y - this.ball.r <= this.players[i].y + this.players[i].height) &&
+        xCompared) {
+      this.players[i].score++;
+      this.ball.directionX *= -1;
+      socket.sockets.emit('update score', {nth: nth, score: this.players[i].score});
+    }
+  }
 }
 
 Game.prototype.movePlayer = function(client, data) {
