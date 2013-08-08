@@ -128,15 +128,15 @@ Game.prototype.removePlayer = function(client) {
 Game.prototype.setEventHandlers = function(socket){
 	socket.sockets.on('connection', function(client) {
 	  client.on('disconnect', function() {
-      game.removePlayer(this);
+      this.removePlayer(this);
     });
 
 	  client.on('new player', function(data) {
-      game.addPlayer(this, data);
+      this.addPlayer(this, data);
     });
 
 	  client.on('player moved', function(data) {
-      game.movePlayer(this, data);
+      this.movePlayer(this, data);
     });
   });
 }
