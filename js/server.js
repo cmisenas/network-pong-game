@@ -15,11 +15,8 @@ var GameState = function(options, socket){
 }
 
 GameState.prototype.sendUpdate = function(ball, players){
-  //move ball
   this.socket.sockets.emit('move ball', {x: ball.x, y: ball.y});
-  //player moved
   this.socket.sockets.emit('player moved', {player1: {y : players[0].y}, player2: {y : players[1].y}});
-  //update score
   this.socket.sockets.emit('update score', {score1 : players[0].score, score2 : players[1].score});
 }
 
@@ -70,9 +67,7 @@ Game.prototype.start = function() {
   var self = this;
   var loop = setInterval(function() {
     self.ball.update((Date.now() - time)/1000);
-
     self.collisionDetect();
-    
     self.state.sendUpdate(self.ball, self.players);
 
     if(!self.ball.isInPlayArea()){
