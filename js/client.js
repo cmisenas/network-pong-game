@@ -113,7 +113,7 @@ function onGameOver(data){
 }
 
 function onUpdateScore(data){
-  if((parseInt(data.nth) === 1 && player.nth === 1) || (parseInt(data.nth) === 2 && player.nth === 2)){
+  if((parseInt(data.nth, 10) === 1 && player.nth === 1) || (parseInt(data.nth, 10) === 2 && player.nth === 2)){
     player.score = data.score;
   }else{
     otherPlayer.score = data.score;

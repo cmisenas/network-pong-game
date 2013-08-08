@@ -69,7 +69,7 @@ Game.prototype.start = function() {
 Game.prototype.collisionDetect = function() {
   //do collision detection on the game objects--player 1, 2 and ball
   for(var i = 0, maxPlayers = this.players.length; i < maxPlayers; i++){
-    var nth = parseInt(this.players[i].nth);
+    var nth = parseInt(this.players[i].nth, 10);
     var playerXStartToCompare = nth === 1 ?
       this.players[i].x :
       this.players[i].x + this.players[i].width;
