@@ -103,7 +103,7 @@ function onDisconnected(data){
 }
 
 function onPlayerMoved(data){
-  otherPlayer.y = data.y;
+  otherPlayer.y = otherPlayer.nth === 1 ? data.player1.y : data.player2.y;
 }
 
 function onGameOver(data){
@@ -113,12 +113,8 @@ function onGameOver(data){
 }
 
 function onUpdateScore(data){
-  if((parseInt(data.nth, 10) === 1 && player.nth === 1) || (parseInt(data.nth, 10) === 2 && player.nth === 2)){
-    player.score = data.score;
-  }else{
-    otherPlayer.score = data.score;
-  }
-  console.log(player.score, otherPlayer.score);
+  player.score = player.nth === 1 ? data.score1 : data.score2;
+  otherPlayer.score = otherPlayer.nth === 1 ? data.score1 : data.score2;
 }
 
 

@@ -7,8 +7,25 @@ var Player = require('./Players').Player,
     Ball = require('./Ball').Ball;
     Game = require('./Game').Game;
 
+var GameState = function(options, socket){
+  var defaults = {step: 50};
+  this.state = {};
+  this.settings = extend(defaults, options);
+  this.socket = socket; 
+}
+
+GameState.prototype.sendUpdate = function(ball, players){
+  //move ball
+  this.socket.sockets.emit('move ball', {x: ball.x, y: ball.y});
+  //player moved
+  this.socket.sockets.emit('player moved', {player1: {y : players[0].y}, player2: {y : players[1].y}});
+  //update score
+  this.socket.sockets.emit('update score', {score1 : players[0].score, score2 : players[1].score});
+}
+
 Game.prototype.init = function() {
     this.ball = new Ball(this.width, this.height);
+    this.state = new GameState(null, socket);
 }
 
 Game.prototype.addPlayer = function(client, data) {
@@ -53,8 +70,9 @@ Game.prototype.start = function() {
   var loop = setInterval(function() {
     self.ball.update((Date.now() - time)/1000);
 
-    socket.sockets.emit('move ball', {x: self.ball.x, y: self.ball.y});
     self.collisionDetect();
+    
+    self.state.sendUpdate(self.ball, self.players);
 
     if(!self.ball.isInPlayArea()){
       console.log('Game Over');
@@ -63,7 +81,7 @@ Game.prototype.start = function() {
     }
 
     time = Date.now();
-  }, 50);
+  }, this.state.step);
 }
 
 Game.prototype.collisionDetect = function() {
@@ -87,7 +105,6 @@ Game.prototype.collisionDetect = function() {
         xCompared) {
       this.players[i].score++;
       this.ball.directionX *= -1;
-      socket.sockets.emit('update score', {nth: nth, score: this.players[i].score});
     }
   }
 }
@@ -95,7 +112,6 @@ Game.prototype.collisionDetect = function() {
 Game.prototype.movePlayer = function(client, data) {
   var playerIndex = findIndexById(client.id);
   this.players[playerIndex].y = data.y;
-  client.broadcast.emit('player moved', {y: data.y});
 }
 
 Game.prototype.removePlayer = function(client) {
@@ -175,6 +191,21 @@ function findIndexById(playerId){
 		if(game.players[i].id === playerId)
 			return i;
 	}
+}
+
+function extend(def, opt){
+  opt = opt || {}; 
+  var ext = {}; 
+
+  for (prop in def) {
+    if (def.hasOwnProperty(prop) && typeof opt[prop] != 'undefined') {
+      ext[prop] = opt[prop];
+    } else if (def.hasOwnProperty(prop) && typeof opt[prop] == 'undefined') {
+      ext[prop] = def[prop];
+    }   
+  }
+
+  return ext; 
 }
 
 var socket = initSocketIO(startServer());
