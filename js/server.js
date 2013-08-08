@@ -23,9 +23,10 @@ GameState.prototype.sendUpdate = function(ball, players){
   this.socket.sockets.emit('update score', {score1 : players[0].score, score2 : players[1].score});
 }
 
-Game.prototype.init = function() {
+Game.prototype.init = function(socket) {
     this.ball = new Ball(this.width, this.height);
     this.state = new GameState(null, socket);
+    this.setEventHandlers(socket);
 }
 
 Game.prototype.addPlayer = function(client, data) {
@@ -124,6 +125,23 @@ Game.prototype.removePlayer = function(client) {
   }
 }
 
+Game.prototype.setEventHandlers = function(socket){
+	socket.sockets.on('connection', function(client) {
+	  client.on('disconnect', function() {
+      game.removePlayer(this);
+    });
+
+	  client.on('new player', function(data) {
+      game.addPlayer(this, data);
+    });
+
+	  client.on('player moved', function(data) {
+      game.movePlayer(this, data);
+    });
+  });
+}
+
+
 Ball.prototype.update = function(mod){
   if(this.y - this.r <= 0 || this.y + this.r >= this.CANVAS_HEIGHT)
     this.directionY *= -1;
@@ -170,22 +188,6 @@ function initSocketIO(app){
   return socket;
 }
 
-function setEventHandlers(socket){
-	socket.sockets.on('connection', function(client) {
-	  client.on('disconnect', function() {
-      game.removePlayer(this);
-    });
-
-	  client.on('new player', function(data) {
-      game.addPlayer(this, data);
-    });
-
-	  client.on('player moved', function(data) {
-      game.movePlayer(this, data);
-    });
-  });
-}
-
 function findIndexById(playerId){
 	for(var i = 0, maxPlayers = game.players.length; i < maxPlayers; i++){
 		if(game.players[i].id === playerId)
@@ -210,5 +212,4 @@ function extend(def, opt){
 
 var socket = initSocketIO(startServer());
 var game = new Game();
-game.init();
-setEventHandlers(socket);
+game.init(socket);
