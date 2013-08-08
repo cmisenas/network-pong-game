@@ -78,11 +78,9 @@ Game.prototype.collisionDetect = function() {
       this.players[i].x ;
 
     //bounce ball if its x is equal to or past the start x of the paddle but not past the end x of the paddle
-    if(nth === 1){
-      var xCompared = this.ball.x + this.ball.r >= playerXStartToCompare && this.ball.x + this.ball.r < playerXEndToCompare;
-    }else{
-      var xCompared = this.ball.x - this.ball.r <= playerXStartToCompare && this.ball.x + this.ball.r > playerXEndToCompare;
-    }
+    var xCompared = nth === 1 ?
+      this.ball.x + this.ball.r >= playerXStartToCompare && this.ball.x + this.ball.r < playerXEndToCompare : 
+      this.ball.x - this.ball.r <= playerXStartToCompare && this.ball.x + this.ball.r > playerXEndToCompare;
 
     if ((this.ball.y + this.ball.r >= this.players[i].y &&
          this.ball.y - this.ball.r <= this.players[i].y + this.players[i].height) &&
