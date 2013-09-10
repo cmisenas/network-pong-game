@@ -159,7 +159,7 @@ var serveStaticFile = function(filename, type, res) {
 };
 
 var startServer = function() {
-  var PORT = 8000;
+  var PORT = 80;
   var app = http.createServer(function(req, res){
 	  var pathname = url.parse(req.url).pathname;
 	  if (pathname == '/') {

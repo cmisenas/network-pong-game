@@ -32,7 +32,7 @@ Ball.prototype.draw = function(){
 }
 
 Game.prototype.init = function() {
-  socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+  socket = io.connect(window.location.hostname, {port: 80, transports: ["websocket"]});
   //instantiate player
   player = new Player(null, null, 5, 10, 70, null);
   //emit player has joined
